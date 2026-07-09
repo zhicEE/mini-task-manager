@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from models import Task
 
 app = Flask(__name__)
 
@@ -6,9 +7,9 @@ app = Flask(__name__)
 @app.route("/")
 def home():
     tasks = [
-        "Finish Flask",
-        "Learn SQL",
-        "Practice LeetCode"
+        Task("Finish Flask", "10 July"),
+        Task("Learn SQL", "11 July"),
+        Task("Practice LeetCode", "12 July")
     ]
 
     return render_template("index.html", tasks=tasks)

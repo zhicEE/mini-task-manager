@@ -11,7 +11,13 @@
 
 <ul>
     {% for task in tasks %}
-        <li>{{ task }}</li>
+        <li>
+            {{ task.title }}
+            |
+            Deadline: {{ task.deadline }}
+            |
+            Completed: {{ task.completed }}
+        </li>
     {% endfor %}
 </ul>
 
