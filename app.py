@@ -1,19 +1,15 @@
 from flask import Flask, render_template
-from models import Task
+from database import create_table, get_all_tasks
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def home():
-    tasks = [
-        Task("Finish Flask", "10 July"),
-        Task("Learn SQL", "11 July"),
-        Task("Practice LeetCode", "12 July")
-    ]
-
+    tasks = get_all_tasks()
     return render_template("index.html", tasks=tasks)
 
 
 if __name__ == "__main__":
+    create_table()
     app.run(debug=True)

@@ -10,15 +10,15 @@
 <h1>My Task Manager</h1>
 
 <ul>
-    {% for task in tasks %}
-        <li>
-            {{ task.title }}
-            |
-            Deadline: {{ task.deadline }}
-            |
-            Completed: {{ task.completed }}
-        </li>
-    {% endfor %}
+{% for task in tasks %}
+    <li>
+        {{ task[1] }}
+        |
+        Deadline: {{ task[2] }}
+        |
+        Completed: {{ task[3] }}
+    </li>
+{% endfor %}
 </ul>
 
 </body>
