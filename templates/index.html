@@ -12,11 +12,11 @@
 <ul>
 {% for task in tasks %}
     <li>
-        {{ task[1] }}
+        {{ task.title }}
         |
-        Deadline: {{ task[2] }}
+        Deadline: {{ task.deadline }}
         |
-        Completed: {{ task[3] }}
+        Completed: {{ task.completed }}
     </li>
 {% endfor %}
 </ul>
