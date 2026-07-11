@@ -1,4 +1,5 @@
 import sqlite3
+from models import Task
 
 
 def get_connection():
@@ -53,8 +54,19 @@ def get_all_tasks():
     cursor.execute("SELECT * FROM tasks")
     tasks = cursor.fetchall()
 
+    task_objects = []
+    
+    for row in tasks:
+        task = Task(
+            row[1],
+            row[2],
+            bool(row[3])
+        )
+
+        task_objects.append(task)
+
     connection.close()
-    return tasks
+    return task_objects
 
 
 def mark_task_completed(task_id):
@@ -82,3 +94,13 @@ def delete_task(task_id):
 
     connection.commit()
     connection.close()
+
+
+from database import get_all_tasks
+
+tasks = get_all_tasks()
+
+for task in tasks:
+    print(task.title)
+    print(task.deadline)
+    print(task.completed)
