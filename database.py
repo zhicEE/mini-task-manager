@@ -23,20 +23,30 @@ def create_table():
     connection.close()
 
 
-def add_task(title, deadline):
+def add_task(task):
     connection = get_connection()
     cursor = connection.cursor()
 
-    cursor.execute("""
-        INSERT INTO tasks (title, deadline)
-        VALUES (?, ?)
-    """, (title, deadline))
+    cursor.execute(
+        """
+        INSERT INTO tasks (
+            title, deadline, completed
+        )
+        VALUES (?, ?, ?)
+        """,
+        (
+            task.title,
+            task.deadline,
+            task.completed
+        )
+    )
 
     connection.commit()
     connection.close()
 
 
 def get_all_tasks():
+
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -72,9 +82,3 @@ def delete_task(task_id):
 
     connection.commit()
     connection.close()
-
-if __name__ == "__main__":
-    create_table()
-    add_task("Learn CRUD", "14 July")
-    tasks = get_all_tasks()
-    print(tasks)
