@@ -22,15 +22,48 @@ A simple task management web application built with Flask and SQLite.
 ## Project Structure
 
 ```text
-mini-task-manager/
+├── .gitignore
 ├── app.py              # Flask application and routes
-├── models.py           # Task class definition
 ├── database.py         # SQLite database operations
+├── models.py           # Task class definition
+├── requirements.txt    # Python dependencies
 ├── templates/
 │   └── index.html      # HTML template
-├── requirements.txt
 └── README.md
 ```
+
+## Setup
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/zhicEE/mini-task-manager.git
+   cd mini-task-manager
+   ```
+
+2. Create and activate a virtual environment:
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. Install the dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Running the Application
+
+Start the Flask development server:
+
+```bash
+python app.py
+```
+
+Then open <http://127.0.0.1:5000> in your browser. The SQLite database is
+created automatically when the application starts.
 
 ## Learning Goals
 
