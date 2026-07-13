@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from database import create_table, get_all_tasks, add_task
 from models import Task
 
@@ -18,10 +18,9 @@ def add():
     deadline = request.form["deadline"]
 
     task = Task(title, deadline)
-    
     add_task(task)
 
-    return "Task added"
+    return redirect("/")
 
 
 if __name__ == "__main__":
