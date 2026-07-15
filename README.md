@@ -12,12 +12,15 @@ A simple task management web application built with Flask and SQLite.
 
 ## Current Features
 
-- Display tasks from SQLite database
-- Create new tasks through HTML forms
-- Store tasks in SQLite database
-- Use Python class (`Task`) to represent task objects
-- Convert database records into Python objects
-- Render dynamic HTML templates with Jinja2
+- Display tasks stored in SQLite
+- Add new tasks through an HTML form
+- Set a deadline for each task
+- Mark tasks as completed
+- Delete tasks
+- Store task data in a local SQLite database
+- Represent database records as Python `Task` objects
+- Render dynamic pages with Jinja2
+- Redirect users back to the task list after form actions
 
 ## Project Structure
 
@@ -62,8 +65,51 @@ Start the Flask development server:
 python app.py
 ```
 
-Then open <http://127.0.0.1:5000> in your browser. The SQLite database is
-created automatically when the application starts.
+Then open <http://127.0.0.1:5000> in your browser.
+
+The SQLite database is created automatically when the application starts.
+
+## Backend Workflow
+
+### Adding a Task
+
+```text
+User submits HTML form
+        ↓
+POST /add
+        ↓
+Flask reads request.form
+        ↓
+Create a Task object
+        ↓
+Insert task into SQLite
+        ↓
+Redirect to /
+        ↓
+Read tasks from SQLite
+        ↓
+Render the HTML page
+```
+
+### Completing or Deleting a Task
+
+```text
+User clicks a button
+        ↓
+Task ID is added to the URL
+        ↓
+POST /complete/<task_id>
+or
+POST /delete/<task_id>
+        ↓
+Flask receives task_id
+        ↓
+Update or delete the SQLite record
+        ↓
+Redirect to /
+        ↓
+Render the updated task list
+```
 
 ## Learning Goals
 
@@ -72,32 +118,20 @@ This project is built to practice:
 - Flask routing
 - GET and POST requests
 - HTML forms
+- Dynamic URL parameters
+- Redirects
 - Jinja2 templates
 - Python Object-Oriented Programming
-- SQLite database operations
-- Backend data flow
+- SQLite CRUD operations
+- Converting database records into Python objects
+- Backend request and response flow
 - Git version control
-
-## Backend Workflow
-
-```text
-User Input
-    ↓
-Flask Route
-    ↓
-Task Object
-    ↓
-SQLite Database
-    ↓
-Flask Template
-    ↓
-HTML Page
-```
 
 ## Future Features
 
-- Mark tasks as completed
-- Delete tasks
-- Edit tasks
-- Improve UI design
-- Add user authentication
+- Edit existing tasks
+- Filter tasks by completion status
+- Improve form validation
+- Improve the user interface
+- Add automated tests
+- Deploy the application
