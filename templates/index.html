@@ -33,7 +33,12 @@
         <form action="/complete/{{ task.id }}" method="POST">
             <button type="submit">Complete</button>
         </form>
+
+        <form action="/delete/{{ task.id }}" method="POST">
+        <button type="submit">Delete</button>
+        </form>
     </li>
+
 {% endfor %}
 </ul>
 

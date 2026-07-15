@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from database import create_table, get_all_tasks, add_task, mark_task_completed
+from database import create_table, get_all_tasks, add_task, mark_task_completed, delete_task
 from models import Task
 
 app = Flask(__name__)
@@ -26,6 +26,12 @@ def add():
 def complete(task_id):
     mark_task_completed(task_id)
     return redirect("/")
+
+@app.route("/delete/<int:task_id>", methods=["POST"])
+def delete(task_id):
+    delete_task(task_id)
+    return redirect("/")
+
 
 if __name__ == "__main__":
     create_table()
