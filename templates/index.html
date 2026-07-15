@@ -11,14 +11,14 @@
 
 <form action="/add" method="POST">
 
-    <input name="title" palceholder="Task">
+    <input name="title" placeholder="Task">
 
     <input name="deadline" placeholder="Deadline">
 
     <button type="submit">
         Add Task
     </button>
-    
+
 </form>
 
 <ul>
@@ -29,6 +29,10 @@
         Deadline: {{ task.deadline }}
         |
         Completed: {{ task.completed }}
+
+        <form action="/complete/{{ task.id }}" method="POST">
+            <button type="submit">Complete</button>
+        </form>
     </li>
 {% endfor %}
 </ul>

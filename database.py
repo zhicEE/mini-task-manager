@@ -60,7 +60,8 @@ def get_all_tasks():
         task = Task(
             row[1],
             row[2],
-            bool(row[3])
+            bool(row[3]),
+            row[0]
         )
 
         task_objects.append(task)
