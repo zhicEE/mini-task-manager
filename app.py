@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from database import create_table, get_all_tasks, add_task, mark_task_completed, delete_task
+from database import create_table, get_all_tasks, add_task, mark_task_completed, delete_task, get_task_by_id, update_task
 from models import Task
 
 app = Flask(__name__)
@@ -31,6 +31,22 @@ def complete(task_id):
 def delete(task_id):
     delete_task(task_id)
     return redirect("/")
+
+@app.route("/edit/<int:task_id>", methods=["GET", "POST"])
+def edit(task_id):
+    if request.method == "POST":
+        title = request.form["title"]
+        deadline = request.form["deadline"]
+
+        update_task(task_id, title, deadline)
+        return redirect("/")
+    
+    task = get_task_by_id(task_id)
+
+    if task is None:
+        return "Task not found", 404
+    
+    return render_template("edit.html", task=task)
 
 
 if __name__ == "__main__":

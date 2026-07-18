@@ -39,6 +39,8 @@
             Completed
         {% endif %}
 
+        <a href="/edit/{{ task.id }}">Edit</a>
+
         <form action="/delete/{{ task.id }}" method="POST">
         <button type="submit">Delete</button>
         </form>

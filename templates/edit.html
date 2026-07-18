@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Task</title>
+</head>
+
+<body>
+
+<h1>Edit Task</h1>
+
+<form action="/edit/{{ task.id }}" method="POST">
+
+    <input
+        name="title"
+        value="{{ task.title }}"
+    >
+
+    <input
+        name="deadline"
+        value="{{ task.deadline }}"
+    >
+
+    <button type="submit">Save Changes</button>
+
+</form>
+
+</body>
+
+</html>

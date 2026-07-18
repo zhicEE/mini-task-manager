@@ -97,3 +97,38 @@ def delete_task(task_id):
     connection.close()
 
 
+def get_task_by_id(task_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT * FROM tasks
+        WHERE id = ?
+    """, (task_id,))
+
+    row = cursor.fetchone()
+    connection.close()
+
+    if row is None:
+        return None
+    
+    return Task(
+        row[1],
+        row[2],
+        bool(row[3]),
+        row[0]
+    )
+
+
+def update_task(task_id, title, deadline):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        UPDATE tasks
+        SET title = ?, deadline = ?
+        WHERE id = ?
+    """, (title, deadline, task_id))
+
+    connection.commit()
+    connection.close()
