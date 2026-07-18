@@ -15,8 +15,11 @@ A simple task management web application built with Flask and SQLite.
 - Display tasks stored in SQLite
 - Add new tasks through an HTML form
 - Set a deadline for each task
+- Edit existing task titles and deadlines
 - Mark tasks as completed
 - Delete tasks
+- Display an empty-state message when no tasks exist
+- Hide the Complete button after a task is completed
 - Store task data in a local SQLite database
 - Represent database records as Python `Task` objects
 - Render dynamic pages with Jinja2
@@ -31,7 +34,8 @@ A simple task management web application built with Flask and SQLite.
 ├── models.py           # Task class definition
 ├── requirements.txt    # Python dependencies
 ├── templates/
-│   └── index.html      # HTML template
+│   ├── edit.html       # Task editing form
+│   └── index.html      # Main task list page
 └── README.md
 ```
 
@@ -111,6 +115,30 @@ Redirect to /
 Render the updated task list
 ```
 
+### Editing a Task
+
+```text
+User clicks Edit
+        ↓
+GET /edit/<task_id>
+        ↓
+Flask reads the selected task from SQLite
+        ↓
+Render edit.html with the current task data
+        ↓
+User changes the title or deadline
+        ↓
+POST /edit/<task_id>
+        ↓
+Flask reads request.form
+        ↓
+Update the SQLite record
+        ↓
+Redirect to /
+        ↓
+Render the updated task list
+```
+
 ## Learning Goals
 
 This project is built to practice:
@@ -120,7 +148,7 @@ This project is built to practice:
 - HTML forms
 - Dynamic URL parameters
 - Redirects
-- Jinja2 templates
+- Jinja2 templates and conditional rendering
 - Python Object-Oriented Programming
 - SQLite CRUD operations
 - Converting database records into Python objects
@@ -129,7 +157,6 @@ This project is built to practice:
 
 ## Future Features
 
-- Edit existing tasks
 - Filter tasks by completion status
 - Improve form validation
 - Improve the user interface
