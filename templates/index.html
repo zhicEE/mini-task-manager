@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Task Manager</title>
-</head>
-
-<body>
-
-<h1>My Task Manager</h1>
+{% block content %}
 
 <form action="/add" method="POST">
 
@@ -30,11 +23,12 @@
         |
 
         {% if not task.completed %}
-            Completed: {{ task.completed }}
+            Completed: False
 
             <form action="/complete/{{ task.id }}" method="POST">
                 <button type="submit">Complete</button>
             </form>
+
         {% else %}
             Completed
         {% endif %}
@@ -42,14 +36,13 @@
         <a href="/edit/{{ task.id }}">Edit</a>
 
         <form action="/delete/{{ task.id }}" method="POST">
-        <button type="submit">Delete</button>
+            <button type="submit">Delete</button>
         </form>
+        
     </li>
 {% else %}
     <li>No tasks yet.</li>
 {% endfor %}
 </ul>
 
-</body>
-
-</html>
+{% endblock %}

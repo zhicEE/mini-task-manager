@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Edit Task</title>
-</head>
+{% block title %}
+Edit Task
+{% endblock %}
 
-<body>
+{% block content %}
 
 <h1>Edit Task</h1>
 
@@ -21,10 +20,10 @@
         value="{{ task.deadline }}"
     >
 
-    <button type="submit">Save Changes</button>
+    <button type="submit">
+        Save Changes
+    </button>
 
 </form>
 
-</body>
-
-</html>
+{% endblock %}
