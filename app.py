@@ -19,6 +19,10 @@ def add():
     title = request.form["title"]
     deadline = request.form["deadline"]
 
+    if not title.strip():
+        flash("Title cannot be empty!")
+        return redirect("/")
+
     task = Task(title, deadline)
     add_task(task)
 
@@ -47,6 +51,10 @@ def edit(task_id):
     if request.method == "POST":
         title = request.form["title"]
         deadline = request.form["deadline"]
+
+        if not title.strip():
+            flash("Title cannot be empty!")
+            return redirect(f"/edit/{task_id}")
 
         update_task(task_id, title, deadline)
 
