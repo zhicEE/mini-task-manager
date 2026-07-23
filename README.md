@@ -1,164 +1,146 @@
 # Mini Task Manager
 
-A simple task management web application built with Flask and SQLite.
+A small task management web application built with Flask, Jinja2, and SQLite. It demonstrates a complete CRUD workflow: create, view, update, complete, and delete tasks from a browser.
+
+## Features
+
+- Add tasks with a title and deadline
+- View all saved tasks
+- Edit task titles and deadlines
+- Mark tasks as completed
+- Delete tasks
+- Show an empty state when no tasks exist
+- Persist task data in a local SQLite database
+- Share a common page layout through Jinja2 template inheritance
 
 ## Tech Stack
 
 - Python
 - Flask
 - SQLite
-- HTML / Jinja2
-- Git
-
-## Current Features
-
-- Display tasks stored in SQLite
-- Add new tasks through an HTML form
-- Set a deadline for each task
-- Edit existing task titles and deadlines
-- Mark tasks as completed
-- Delete tasks
-- Display an empty-state message when no tasks exist
-- Hide the Complete button after a task is completed
-- Store task data in a local SQLite database
-- Represent database records as Python `Task` objects
-- Render dynamic pages with Jinja2
-- Redirect users back to the task list after form actions
+- Jinja2
+- HTML
 
 ## Project Structure
 
 ```text
-├── .gitignore
-├── app.py              # Flask application and routes
-├── database.py         # SQLite database operations
-├── models.py           # Task class definition
+mini-task-manager/
+├── app.py              # Flask application and route handlers
+├── database.py         # SQLite connection and CRUD operations
+├── models.py           # Task model
 ├── requirements.txt    # Python dependencies
 ├── templates/
+│   ├── base.html       # Shared page layout
 │   ├── edit.html       # Task editing form
-│   └── index.html      # Main task list page
+│   └── index.html      # Task creation form and task list
 └── README.md
 ```
 
-## Setup
+The local `tasks.db` file is generated at runtime and is intentionally excluded from Git.
 
-1. Clone the repository:
+## Getting Started
 
-   ```bash
-   git clone https://github.com/zhicEE/mini-task-manager.git
-   cd mini-task-manager
-   ```
+### 1. Clone the repository
 
-2. Create and activate a virtual environment:
+```bash
+git clone https://github.com/zhicEE/mini-task-manager.git
+cd mini-task-manager
+```
 
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
+### 2. Create and activate a virtual environment
 
-3. Install the dependencies:
+macOS or Linux:
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-## Running the Application
+Windows PowerShell:
 
-Start the Flask development server:
+```powershell
+py -m venv venv
+venv\Scripts\Activate.ps1
+```
+
+### 3. Install the dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the application
 
 ```bash
 python app.py
 ```
 
-Then open <http://127.0.0.1:5000> in your browser.
+Open <http://127.0.0.1:5000> in your browser. The SQLite database and `tasks` table are created automatically the first time the application starts.
 
-The SQLite database is created automatically when the application starts.
+> The built-in Flask server runs in debug mode and is intended for local development only.
 
-## Backend Workflow
+## Routes
 
-### Adding a Task
+| Method | Route | Description |
+| --- | --- | --- |
+| `GET` | `/` | Display all tasks |
+| `POST` | `/add` | Create a task |
+| `GET` | `/edit/<task_id>` | Display the edit form |
+| `POST` | `/edit/<task_id>` | Save changes to a task |
+| `POST` | `/complete/<task_id>` | Mark a task as completed |
+| `POST` | `/delete/<task_id>` | Delete a task |
 
-```text
-User submits HTML form
-        ↓
-POST /add
-        ↓
-Flask reads request.form
-        ↓
-Create a Task object
-        ↓
-Insert task into SQLite
-        ↓
-Redirect to /
-        ↓
-Read tasks from SQLite
-        ↓
-Render the HTML page
-```
+After each form action, the application redirects to the main task list.
 
-### Completing or Deleting a Task
+## Data Model
 
-```text
-User clicks a button
-        ↓
-Task ID is added to the URL
-        ↓
-POST /complete/<task_id>
-or
-POST /delete/<task_id>
-        ↓
-Flask receives task_id
-        ↓
-Update or delete the SQLite record
-        ↓
-Redirect to /
-        ↓
-Render the updated task list
-```
+Each task contains:
 
-### Editing a Task
+| Field | Description |
+| --- | --- |
+| `id` | Auto-incrementing SQLite identifier |
+| `title` | Task title |
+| `deadline` | Deadline stored as text |
+| `completed` | Completion status, stored as `0` or `1` |
+
+Database rows are converted into `Task` objects before being rendered by the templates.
+
+## How It Works
 
 ```text
-User clicks Edit
-        ↓
-GET /edit/<task_id>
-        ↓
-Flask reads the selected task from SQLite
-        ↓
-Render edit.html with the current task data
-        ↓
-User changes the title or deadline
-        ↓
-POST /edit/<task_id>
-        ↓
-Flask reads request.form
-        ↓
-Update the SQLite record
-        ↓
-Redirect to /
-        ↓
-Render the updated task list
+Browser form
+    ↓
+Flask route
+    ↓
+Task object / database operation
+    ↓
+SQLite
+    ↓
+Redirect to the task list
+    ↓
+Jinja2 renders the updated page
 ```
+
+`base.html` defines the shared HTML structure and page title block. `index.html` and `edit.html` extend that base template and provide their own page content.
 
 ## Learning Goals
 
-This project is built to practice:
+This project is designed to practice:
 
-- Flask routing
+- Flask routing and dynamic URL parameters
 - GET and POST requests
-- HTML forms
-- Dynamic URL parameters
-- Redirects
-- Jinja2 templates and conditional rendering
-- Python Object-Oriented Programming
+- HTML forms and redirects
+- Jinja2 loops, conditions, and template inheritance
+- Python object-oriented programming
 - SQLite CRUD operations
 - Converting database records into Python objects
-- Backend request and response flow
 - Git version control
 
-## Future Features
+## Possible Next Steps
 
+- Validate task titles and deadlines
 - Filter tasks by completion status
-- Improve form validation
-- Improve the user interface
+- Sort tasks by deadline
+- Improve the user interface and accessibility
 - Add automated tests
-- Deploy the application
+- Add production-ready configuration and deployment
