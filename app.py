@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 from database import create_table, get_all_tasks, add_task, mark_task_completed, delete_task, get_task_by_id, update_task
 from models import Task
 
 app = Flask(__name__)
+
+app.secret_key = "dev-secret-key"
 
 
 @app.route("/")
@@ -20,16 +22,24 @@ def add():
     task = Task(title, deadline)
     add_task(task)
 
+    flash("Task added successfully!")
+
     return redirect("/")
 
 @app.route("/complete/<int:task_id>", methods=["POST"])
 def complete(task_id):
     mark_task_completed(task_id)
+
+    flash("Task marked as completed!")
+
     return redirect("/")
 
 @app.route("/delete/<int:task_id>", methods=["POST"])
 def delete(task_id):
     delete_task(task_id)
+
+    flash("Task deleted successfully!")
+
     return redirect("/")
 
 @app.route("/edit/<int:task_id>", methods=["GET", "POST"])
@@ -39,6 +49,8 @@ def edit(task_id):
         deadline = request.form["deadline"]
 
         update_task(task_id, title, deadline)
+
+        flash("Task updated successfully!")
         return redirect("/")
     
     task = get_task_by_id(task_id)
