@@ -1,9 +1,17 @@
+import os
 import sqlite3
 from models import Task
 
 
-def get_connection():
-    connection = sqlite3.connect("tasks.db")
+def get_connection():  
+
+    database_path = os.environ.get(
+        "DATABASE_PATH",
+        "tasks.db"
+    )
+
+    connection = sqlite3.connect(database_path)
+
     return connection
 
 
