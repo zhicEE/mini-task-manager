@@ -5,7 +5,7 @@ from app import app
 
 
 @pytest.fixture
-def client():
+def client(db_path):
 
     app.config.update(
         TESTING=True
