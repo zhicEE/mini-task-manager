@@ -130,6 +130,58 @@ def test_complete_task(client, db_path):
     assert b"Test Task" in response.data
 
 
+def test_delete_task(client, db_path):
+
+    client.post(
+        "/add",
+        data={
+            "title": "Test Task",
+            "deadline": ""
+        }
+    )
+
+    tasks = get_tasks(db_path)
+
+    task_id = tasks[0][0]
+
+    response = client.post(
+        f"/delete/{task_id}",
+        follow_redirects=True
+    )
+
+    updated_tasks = get_tasks(db_path)
+
+    assert response.status_code == 200
+    assert len(updated_tasks) == 0
+
+
+def test_save_deadline(client, db_path):
+
+    response = client.post(
+        "/add",
+        data={
+            "title": "Test Task",
+            "deadline": "2026-07-28"
+        },
+        follow_redirects=True
+    )
+
+    tasks = get_tasks(db_path)
+
+    assert response.status_code == 200
+    assert len(tasks) == 1
+    assert b"2026-07-28" in response.data
+    assert tasks[0][2] == "2026-07-28"
+
+
+def test_edit_nonexistent_task(client, db_path):
+
+    response = client.get("/edit/999")
+
+    assert response.status_code == 404
+
+
+
 def get_tasks(db_path):
 
     connection = sqlite3.connect(db_path)
