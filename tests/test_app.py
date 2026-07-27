@@ -72,6 +72,64 @@ def test_empty_title_not_created(client, db_path):
     assert len(tasks) == 0
 
 
+def test_edit_task(client, db_path):
+
+    client.post(
+        "/add",
+        data={
+            "title": "Old Title",
+            "deadline": ""
+        }
+    )
+
+    tasks = get_tasks(db_path)
+
+    task_id = tasks[0][0]
+
+    response = client.post(
+        f"/edit/{task_id}",
+        data={
+            "title": "New Title",
+            "deadline": ""
+        },
+        follow_redirects=True
+    )
+
+    updated_tasks = get_tasks(db_path)
+
+    assert response.status_code == 200
+    assert len(updated_tasks) == 1
+    assert updated_tasks[0][1] == "New Title"
+    assert b"New Title" in response.data
+
+
+def test_complete_task(client, db_path):
+
+    client.post(
+        "/add",
+        data={
+            "title": "Test Task",
+            "deadline": ""
+        }
+    )
+
+    tasks = get_tasks(db_path)
+
+    task_id = tasks[0][0]
+
+    response = client.post(
+        f"/complete/{task_id}",
+        follow_redirects=True
+    )
+
+    updated_tasks = get_tasks(db_path)
+
+    assert response.status_code == 200
+    assert len(updated_tasks) == 1
+    assert updated_tasks[0][3] == 1
+    assert b"Test Task" in response.data
+
+
 def get_tasks(db_path):
 
     connection = sqlite3.connect(db_path)
