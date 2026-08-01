@@ -88,8 +88,12 @@ def mark_task_completed(task_id):
         WHERE id = ?
     """, (task_id,))
 
+    task_found = cursor.rowcount > 0
+
     connection.commit()
     connection.close()
+
+    return task_found
 
 
 def delete_task(task_id):
@@ -101,8 +105,12 @@ def delete_task(task_id):
         WHERE id = ?
     """, (task_id,))
 
+    task_found = cursor.rowcount > 0
+
     connection.commit()
     connection.close()
+
+    return task_found
 
 
 def get_task_by_id(task_id):

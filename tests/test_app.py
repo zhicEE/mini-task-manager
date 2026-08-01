@@ -249,6 +249,28 @@ def test_deadline_boundary(
         assert b"Deadline cannot be in the past!" in response.data
 
 
+@pytest.mark.parametrize(
+    "action",
+    [
+        "complete",
+        "delete",
+    ]
+)
+def test_nonexistent_task_action_returns_404(
+    client,
+    db_path,
+    action
+):
+
+    response = client.post(f"/{action}/999")
+
+    tasks = get_tasks(db_path)
+
+    assert response.status_code == 404
+    assert b"Task not found" in response.data
+    assert len(tasks) == 0
+
+
 def get_tasks(db_path):
 
     connection = sqlite3.connect(db_path)

@@ -59,7 +59,11 @@ def add():
 
 @app.route("/complete/<int:task_id>", methods=["POST"])
 def complete(task_id):
-    mark_task_completed(task_id)
+
+    task_found = mark_task_completed(task_id)
+
+    if not task_found:
+        return "Task not found", 404
 
     flash("Task marked as completed!")
 
@@ -67,7 +71,11 @@ def complete(task_id):
 
 @app.route("/delete/<int:task_id>", methods=["POST"])
 def delete(task_id):
-    delete_task(task_id)
+
+    task_found = delete_task(task_id)
+
+    if not task_found:
+        return "Task not found", 404
 
     flash("Task deleted successfully!")
 
