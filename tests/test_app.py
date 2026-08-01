@@ -181,6 +181,31 @@ def test_edit_nonexistent_task(client, db_path):
     assert response.status_code == 404
 
 
+@pytest.mark.parametrize(
+    "deadline",
+    [
+        "2026/08/01",
+        "2026-8-1",
+        "not-a-date",
+        "2026-02-30",
+    ]
+)
+def test_invalid_deadline_not_created(client, db_path, deadline):
+
+    response=client.post(
+        "/add",
+        data={"title": "Test Task",
+              "deadline": deadline
+        },
+        follow_redirects=True
+    )
+
+    tasks = get_tasks(db_path)
+
+    assert response.status_code == 200
+    assert b"Deadline must be a valid date in YYYY-MM-DD format!" in response.data
+    assert len(tasks) == 0
+
 
 def get_tasks(db_path):
 

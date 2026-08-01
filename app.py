@@ -1,3 +1,5 @@
+from datetime import date
+import re
 from flask import Flask, render_template, request, redirect, flash
 from database import create_table, get_all_tasks, add_task, mark_task_completed, delete_task, get_task_by_id, update_task
 from models import Task
@@ -5,6 +7,21 @@ from models import Task
 app = Flask(__name__)
 
 app.secret_key = "dev-secret-key"
+
+def is_valid_deadline(deadline):
+
+    if not deadline:
+        return True
+
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", deadline):
+        return False
+
+    try:
+        date.fromisoformat(deadline)
+    except ValueError:
+        return False
+
+    return True
 
 
 @app.route("/")
@@ -21,6 +38,10 @@ def add():
 
     if not title.strip():
         flash("Title cannot be empty!")
+        return redirect("/")
+
+    if not is_valid_deadline(deadline):
+        flash("Deadline must be a valid date in YYYY-MM-DD format!")
         return redirect("/")
 
     task = Task(title, deadline)
