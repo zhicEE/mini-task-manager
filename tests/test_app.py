@@ -2,6 +2,7 @@ import pytest
 import sqlite3
 
 from app import app
+from datetime import date, timedelta
 
 
 @pytest.fixture
@@ -157,11 +158,15 @@ def test_delete_task(client, db_path):
 
 def test_save_deadline(client, db_path):
 
+    future_deadline = (
+        date.today() + timedelta(days=1)
+    ).isoformat()
+
     response = client.post(
         "/add",
         data={
             "title": "Test Task",
-            "deadline": "2026-07-28"
+            "deadline": future_deadline
         },
         follow_redirects=True
     )
@@ -170,8 +175,8 @@ def test_save_deadline(client, db_path):
 
     assert response.status_code == 200
     assert len(tasks) == 1
-    assert b"2026-07-28" in response.data
-    assert tasks[0][2] == "2026-07-28"
+    assert future_deadline.encode() in response.data
+    assert tasks[0][2] == future_deadline
 
 
 def test_edit_nonexistent_task(client, db_path):
@@ -205,6 +210,43 @@ def test_invalid_deadline_not_created(client, db_path, deadline):
     assert response.status_code == 200
     assert b"Deadline must be a valid date in YYYY-MM-DD format!" in response.data
     assert len(tasks) == 0
+
+
+@pytest.mark.parametrize(
+    ("days_from_today", "expected_task_count"),
+    [
+        (-1, 0),
+        (0, 1),
+        (1, 1),
+    ]
+)
+def test_deadline_boundary(
+    client,
+    db_path,
+    days_from_today,
+    expected_task_count
+):
+
+    deadline = (
+        date.today() + timedelta(days=days_from_today)
+    ).isoformat()
+
+    response = client.post(
+        "/add",
+        data={
+            "title": "Boundary Test",
+            "deadline": deadline
+        },
+        follow_redirects=True
+    )
+
+    tasks = get_tasks(db_path)
+
+    assert response.status_code == 200
+    assert len(tasks) == expected_task_count
+
+    if days_from_today < 0:
+        assert b"Deadline cannot be in the past!" in response.data
 
 
 def get_tasks(db_path):

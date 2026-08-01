@@ -8,20 +8,24 @@ app = Flask(__name__)
 
 app.secret_key = "dev-secret-key"
 
-def is_valid_deadline(deadline):
+
+def validate_deadline(deadline):
 
     if not deadline:
-        return True
+        return None
 
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", deadline):
-        return False
+        return "Deadline must be a valid date in YYYY-MM-DD format!"
 
     try:
-        date.fromisoformat(deadline)
+        parsed_deadline = date.fromisoformat(deadline)
     except ValueError:
-        return False
+        return "Deadline must be a valid date in YYYY-MM-DD format!"
 
-    return True
+    if parsed_deadline < date.today():
+        return "Deadline cannot be in the past!"
+
+    return None
 
 
 @app.route("/")
@@ -40,8 +44,10 @@ def add():
         flash("Title cannot be empty!")
         return redirect("/")
 
-    if not is_valid_deadline(deadline):
-        flash("Deadline must be a valid date in YYYY-MM-DD format!")
+    deadline_error = validate_deadline(deadline)
+
+    if deadline_error:
+        flash(deadline_error)
         return redirect("/")
 
     task = Task(title, deadline)
