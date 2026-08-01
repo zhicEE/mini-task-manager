@@ -91,6 +91,12 @@ def edit(task_id):
             flash("Title cannot be empty!")
             return redirect(f"/edit/{task_id}")
 
+        deadline_error = validate_deadline(deadline)
+
+        if deadline_error:
+            flash(deadline_error)
+            return redirect(f"/edit/{task_id}")
+
         update_task(task_id, title, deadline)
 
         flash("Task updated successfully!")

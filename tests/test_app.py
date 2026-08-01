@@ -271,6 +271,53 @@ def test_nonexistent_task_action_returns_404(
     assert len(tasks) == 0
 
 
+@pytest.mark.parametrize(
+    ("invalid_deadline", "error_message"),
+    [
+        (
+            "2026/08/10",
+            b"Deadline must be a valid date in YYYY-MM-DD format!"
+        ),
+        (
+            (date.today() - timedelta(days=1)).isoformat(),
+            b"Deadline cannot be in the past!"
+        ),
+    ]
+)
+def test_edit_rejects_invalid_deadline(
+    client,
+    db_path,
+    invalid_deadline,
+    error_message
+):
+
+    client.post(
+        "/add",
+        data={
+            "title": "Original Title",
+            "deadline": ""
+        }
+    )
+
+    task_id = get_tasks(db_path)[0][0]
+
+    response = client.post(
+        f"/edit/{task_id}",
+        data={
+            "title": "Changed Title",
+            "deadline": invalid_deadline
+        },
+        follow_redirects=True
+    )
+
+    task = get_tasks(db_path)[0]
+
+    assert response.status_code == 200
+    assert error_message in response.data
+    assert task[1] == "Original Title"
+    assert task[2] == ""
+
+
 def get_tasks(db_path):
 
     connection = sqlite3.connect(db_path)
