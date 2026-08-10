@@ -37,7 +37,7 @@ def home():
 @app.route("/add", methods=["POST"])
 def add():
 
-    title = request.form["title"]
+    title = request.form["title"].strip()
     deadline = request.form["deadline"]
 
     if not title.strip():
@@ -84,10 +84,10 @@ def delete(task_id):
 @app.route("/edit/<int:task_id>", methods=["GET", "POST"])
 def edit(task_id):
     if request.method == "POST":
-        title = request.form["title"]
+        title = request.form["title"].strip()
         deadline = request.form["deadline"]
 
-        if not title.strip():
+        if not title:
             flash("Title cannot be empty!")
             return redirect(f"/edit/{task_id}")
 
@@ -103,7 +103,7 @@ def edit(task_id):
             return "Task not found", 404
 
         flash("Task updated successfully!")
-        
+
         return redirect("/")
     
     task = get_task_by_id(task_id)

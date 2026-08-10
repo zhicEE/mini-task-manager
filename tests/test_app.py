@@ -73,7 +73,7 @@ def test_empty_title_not_created(client, db_path):
     assert len(tasks) == 0
 
 
-def test_edit_task(client, db_path):
+def test_edit_task_title_is_trimmed(client, db_path):
 
     client.post(
         "/add",
@@ -90,7 +90,7 @@ def test_edit_task(client, db_path):
     response = client.post(
         f"/edit/{task_id}",
         data={
-            "title": "New Title",
+            "title": "    New Title    ",
             "deadline": ""
         },
         follow_redirects=True
@@ -333,6 +333,22 @@ def test_post_edit_nonexistent_task_returns_404(client, db_path):
     assert response.status_code == 404
     assert b"Task not found" in response.data
     assert len(tasks) == 0
+
+
+def test_task_title_is_trimmed(client, db_path):
+
+    client.post(
+        "/add",
+        data={
+            "title": "  Learn Flask    ",
+            "deadline": ""
+        }
+    )
+
+    tasks = get_tasks(db_path)
+
+    assert len(tasks) == 1
+    assert tasks[0][1] == "Learn Flask"
 
 
 def get_tasks(db_path):
