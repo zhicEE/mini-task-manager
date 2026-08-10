@@ -97,9 +97,13 @@ def edit(task_id):
             flash(deadline_error)
             return redirect(f"/edit/{task_id}")
 
-        update_task(task_id, title, deadline)
+        task_found = update_task(task_id, title, deadline)
+
+        if not task_found:
+            return "Task not found", 404
 
         flash("Task updated successfully!")
+        
         return redirect("/")
     
     task = get_task_by_id(task_id)

@@ -146,5 +146,9 @@ def update_task(task_id, title, deadline):
         WHERE id = ?
     """, (title, deadline, task_id))
 
+    task_found = cursor.rowcount > 0
+
     connection.commit()
     connection.close()
+
+    return task_found

@@ -318,6 +318,23 @@ def test_edit_rejects_invalid_deadline(
     assert task[2] == ""
 
 
+def test_post_edit_nonexistent_task_returns_404(client, db_path):
+
+    response = client.post(
+        "/edit/999",
+        data={
+            "title": "Ghost Task",
+            "deadline": ""
+        }
+    )
+
+    tasks = get_tasks(db_path)
+
+    assert response.status_code == 404
+    assert b"Task not found" in response.data
+    assert len(tasks) == 0
+
+
 def get_tasks(db_path):
 
     connection = sqlite3.connect(db_path)
