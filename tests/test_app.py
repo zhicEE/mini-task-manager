@@ -160,6 +160,35 @@ def test_tasks_are_ordered_by_status_and_deadline(client, db_path):
     assert page.index(b"Later") < page.index(b"No deadline") < page.index(b"Sooner")
 
 
+def test_tasks_can_be_filtered_by_status(client, db_path):
+    client.post("/add", data={"title": "Active task", "deadline": ""})
+    client.post("/add", data={"title": "Done task", "deadline": ""})
+
+    done_task_id = next(
+        row[0] for row in get_tasks(db_path) if row[1] == "Done task"
+    )
+    client.post(f"/complete/{done_task_id}")
+
+    active_page = client.get("/?status=active").data
+    assert b"Active task" in active_page
+    assert b"Done task" not in active_page
+
+    completed_page = client.get("/?status=completed").data
+    assert b"Done task" in completed_page
+    assert b"Active task" not in completed_page
+
+
+def test_unknown_status_filter_falls_back_to_all(client):
+    client.post("/add", data={"title": "Visible task", "deadline": ""})
+
+    response = client.get("/?status=unknown")
+
+    assert response.status_code == 200
+    assert b"Visible task" in response.data
+    assert b'href="/?status=all"' in response.data
+    assert b'class="filter-link is-active"' in response.data
+
+
 def test_delete_task(client, db_path):
 
     client.post(

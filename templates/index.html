@@ -1,48 +1,91 @@
 {% extends "base.html" %}
 
 {% block content %}
+<section class="hero">
+    <p class="eyebrow">Stay focused</p>
+    <h1>Make space for what matters.</h1>
+    <p class="hero-copy">Capture your next step, give it a date, and keep moving.</p>
+</section>
 
-<form action="/add" method="POST">
+<section class="panel add-panel" aria-labelledby="add-task-heading">
+    <h2 id="add-task-heading">Add a task</h2>
+    <form class="task-form" action="{{ url_for('add') }}" method="post">
+        <div class="field field-grow">
+            <label for="title">What needs doing?</label>
+            <input id="title" name="title" placeholder="e.g. Prepare project demo" required autofocus>
+        </div>
 
-    <input name="title" placeholder="Task">
+        <div class="field">
+            <label for="deadline">Deadline <span>(optional)</span></label>
+            <input id="deadline" name="deadline" type="date" min="{{ today }}">
+        </div>
 
-    <input name="deadline" placeholder="Deadline">
+        <button class="button button-primary" type="submit">Add task</button>
+    </form>
+</section>
 
-    <button type="submit">
-        Add Task
-    </button>
+<section class="tasks-section" aria-labelledby="tasks-heading">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Your list</p>
+            <h2 id="tasks-heading">Tasks</h2>
+        </div>
 
-</form>
+        <nav class="filters" aria-label="Filter tasks">
+            {% for status, label in (("all", "All"), ("active", "Active"), ("completed", "Done")) %}
+                <a
+                    href="{{ url_for('home', status=status) }}"
+                    class="filter-link{% if current_status == status %} is-active{% endif %}"
+                    {% if current_status == status %}aria-current="page"{% endif %}
+                >{{ label }} <span>{{ counts[status] }}</span></a>
+            {% endfor %}
+        </nav>
+    </div>
 
-<ul>
-{% for task in tasks %}
-    <li>
-        {{ task.title }}
-        |
-        Deadline: {{ task.deadline }}
-        |
+    {% if tasks %}
+        <ul class="task-list">
+        {% for task in tasks %}
+            <li class="task-card{% if task.completed %} is-completed{% endif %}">
+                <div class="task-status" aria-hidden="true">{% if task.completed %}✓{% endif %}</div>
 
-        {% if not task.completed %}
-            Completed: False
+                <div class="task-details">
+                    <h3>{{ task.title }}</h3>
+                    {% if task.deadline %}
+                        <p class="task-deadline">Due <time datetime="{{ task.deadline }}">{{ task.deadline }}</time></p>
+                    {% else %}
+                        <p class="task-deadline">No deadline</p>
+                    {% endif %}
+                </div>
 
-            <form action="/complete/{{ task.id }}" method="POST">
-                <button type="submit">Complete</button>
-            </form>
+                <div class="task-actions">
+                    {% if not task.completed %}
+                        <form action="{{ url_for('complete', task_id=task.id) }}" method="post">
+                            <button class="button button-success" type="submit">Complete</button>
+                        </form>
+                    {% else %}
+                        <span class="done-label">Completed</span>
+                    {% endif %}
 
-        {% else %}
-            Completed
-        {% endif %}
+                    <a class="button button-secondary" href="{{ url_for('edit', task_id=task.id) }}">Edit</a>
 
-        <a href="/edit/{{ task.id }}">Edit</a>
-
-        <form action="/delete/{{ task.id }}" method="POST">
-            <button type="submit">Delete</button>
-        </form>
-        
-    </li>
-{% else %}
-    <li>No tasks yet.</li>
-{% endfor %}
-</ul>
-
+                    <form action="{{ url_for('delete', task_id=task.id) }}" method="post">
+                        <button class="button button-danger" type="submit">Delete</button>
+                    </form>
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <span aria-hidden="true">◎</span>
+            {% if current_status == "all" %}
+                <h3>Your list is clear</h3>
+                <p>Add your first task above.</p>
+            {% else %}
+                <h3>No {{ current_status }} tasks</h3>
+                <p>Try another filter to see the rest of your list.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
 {% endblock %}

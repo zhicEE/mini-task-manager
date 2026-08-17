@@ -2,7 +2,16 @@ from datetime import date
 import os
 import re
 from flask import Flask, flash, redirect, render_template, request, url_for
-from database import create_table, get_all_tasks, add_task, mark_task_completed, delete_task, get_task_by_id, update_task
+from database import (
+    add_task,
+    create_table,
+    delete_task,
+    get_all_tasks,
+    get_task_by_id,
+    get_task_counts,
+    mark_task_completed,
+    update_task,
+)
 from models import Task
 
 app = Flask(__name__)
@@ -34,8 +43,17 @@ def validate_deadline(deadline):
 
 @app.route("/")
 def home():
-    tasks = get_all_tasks()
-    return render_template("index.html", tasks=tasks)
+    status = request.args.get("status", "all")
+    if status not in {"all", "active", "completed"}:
+        status = "all"
+
+    return render_template(
+        "index.html",
+        tasks=get_all_tasks(status),
+        counts=get_task_counts(),
+        current_status=status,
+        today=date.today().isoformat(),
+    )
 
 @app.route("/add", methods=["POST"])
 def add():
@@ -111,7 +129,11 @@ def edit(task_id):
     if task is None:
         return "Task not found", 404
     
-    return render_template("edit.html", task=task)
+    return render_template(
+        "edit.html",
+        task=task,
+        today=date.today().isoformat(),
+    )
 
 
 if __name__ == "__main__":

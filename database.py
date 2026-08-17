@@ -42,11 +42,19 @@ def add_task(task):
         connection.commit()
 
 
-def get_all_tasks():
+def get_all_tasks(status="all"):
+    status_conditions = {
+        "all": "",
+        "active": "WHERE completed = 0",
+        "completed": "WHERE completed = 1",
+    }
+    condition = status_conditions.get(status, "")
+
     with closing(get_connection()) as connection:
-        rows = connection.execute("""
+        rows = connection.execute(f"""
             SELECT id, title, deadline, completed
             FROM tasks
+            {condition}
             ORDER BY
                 completed ASC,
                 CASE WHEN deadline IS NULL OR deadline = '' THEN 1 ELSE 0 END,
@@ -55,6 +63,23 @@ def get_all_tasks():
         """).fetchall()
 
     return [_row_to_task(row) for row in rows]
+
+
+def get_task_counts():
+    with closing(get_connection()) as connection:
+        total, active, completed = connection.execute("""
+            SELECT
+                COUNT(*),
+                SUM(CASE WHEN completed = 0 THEN 1 ELSE 0 END),
+                SUM(CASE WHEN completed = 1 THEN 1 ELSE 0 END)
+            FROM tasks
+        """).fetchone()
+
+    return {
+        "all": total,
+        "active": active or 0,
+        "completed": completed or 0,
+    }
 
 
 def mark_task_completed(task_id):
