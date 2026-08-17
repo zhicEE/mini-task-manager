@@ -9,9 +9,12 @@ A small task management web application built with Flask, Jinja2, and SQLite. It
 - Edit task titles and deadlines
 - Mark tasks as completed
 - Delete tasks
-- Show an empty state when no tasks exist
+- Filter tasks by all, active, or completed status
+- Prioritize active tasks and sort dated tasks by deadline
+- Show task counts and context-aware empty states
 - Persist task data in a local SQLite database
-- Share a common page layout through Jinja2 template inheritance
+- Use a responsive, accessible interface on desktop and mobile
+- Validate task input and return clear feedback
 
 ## Tech Stack
 
@@ -19,7 +22,8 @@ A small task management web application built with Flask, Jinja2, and SQLite. It
 - Flask
 - SQLite
 - Jinja2
-- HTML
+- HTML and CSS
+- Pytest
 
 ## Project Structure
 
@@ -29,10 +33,15 @@ mini-task-manager/
 ├── database.py         # SQLite connection and CRUD operations
 ├── models.py           # Task model
 ├── requirements.txt    # Python dependencies
+├── pytest.ini          # Test configuration
+├── static/
+│   └── styles.css      # Responsive interface styles
 ├── templates/
 │   ├── base.html       # Shared page layout
 │   ├── edit.html       # Task editing form
 │   └── index.html      # Task creation form and task list
+├── tests/
+│   └── test_app.py     # Application test suite
 └── README.md
 ```
 
@@ -77,7 +86,33 @@ python app.py
 
 Open <http://127.0.0.1:5000> in your browser. The SQLite database and `tasks` table are created automatically the first time the application starts.
 
-> The built-in Flask server runs in debug mode and is intended for local development only.
+To enable Flask's debugger during local development:
+
+```bash
+FLASK_DEBUG=1 python app.py
+```
+
+The built-in Flask server is intended for local development only.
+
+## Configuration
+
+| Environment variable | Purpose | Default |
+| --- | --- | --- |
+| `DATABASE_PATH` | Location of the SQLite database | `tasks.db` |
+| `SECRET_KEY` | Flask session signing key | Local development value |
+| `FLASK_DEBUG` | Enable debug mode when set to `1` | Disabled |
+
+Set a strong `SECRET_KEY` when running the app outside local development.
+
+## Tests
+
+Run the complete test suite with:
+
+```bash
+pytest
+```
+
+Tests use an isolated temporary SQLite database and cover task creation, editing, completion, deletion, validation, ordering, filtering, and missing-resource behavior.
 
 ## Routes
 
@@ -134,13 +169,7 @@ This project is designed to practice:
 - Python object-oriented programming
 - SQLite CRUD operations
 - Converting database records into Python objects
+- Input validation and error handling
+- Automated testing with isolated data
+- Responsive and accessible interface design
 - Git version control
-
-## Possible Next Steps
-
-- Validate task titles and deadlines
-- Filter tasks by completion status
-- Sort tasks by deadline
-- Improve the user interface and accessibility
-- Add automated tests
-- Add production-ready configuration and deployment
