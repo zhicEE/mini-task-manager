@@ -73,6 +73,14 @@ def test_empty_title_not_created(client, db_path):
     assert len(tasks) == 0
 
 
+def test_missing_form_fields_are_handled(client, db_path):
+    response = client.post("/add", data={}, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b"Title cannot be empty!" in response.data
+    assert get_tasks(db_path) == []
+
+
 def test_edit_task_title_is_trimmed(client, db_path):
 
     client.post(
@@ -129,6 +137,27 @@ def test_complete_task(client, db_path):
     assert len(updated_tasks) == 1
     assert updated_tasks[0][3] == 1
     assert b"Test Task" in response.data
+
+
+def test_tasks_are_ordered_by_status_and_deadline(client, db_path):
+    future_deadline = (date.today() + timedelta(days=2)).isoformat()
+    later_deadline = (date.today() + timedelta(days=5)).isoformat()
+
+    for title, deadline in (
+        ("No deadline", ""),
+        ("Later", later_deadline),
+        ("Sooner", future_deadline),
+    ):
+        client.post("/add", data={"title": title, "deadline": deadline})
+
+    page = client.get("/").data
+    assert page.index(b"Sooner") < page.index(b"Later") < page.index(b"No deadline")
+
+    task_id = next(row[0] for row in get_tasks(db_path) if row[1] == "Sooner")
+    client.post(f"/complete/{task_id}")
+
+    page = client.get("/").data
+    assert page.index(b"Later") < page.index(b"No deadline") < page.index(b"Sooner")
 
 
 def test_delete_task(client, db_path):

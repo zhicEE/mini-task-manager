@@ -1,5 +1,7 @@
 import os
 import sqlite3
+from contextlib import closing
+
 from models import Task
 
 
@@ -16,139 +18,101 @@ def get_connection():
 
 
 def create_table():
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            deadline TEXT,
-            completed INTEGER DEFAULT 0
-        )
-    """)
-
-    connection.commit()
-    connection.close()
+    with closing(get_connection()) as connection:
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                deadline TEXT,
+                completed INTEGER NOT NULL DEFAULT 0
+            )
+        """)
+        connection.commit()
 
 
 def add_task(task):
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute(
-        """
-        INSERT INTO tasks (
-            title, deadline, completed
+    with closing(get_connection()) as connection:
+        connection.execute(
+            """
+            INSERT INTO tasks (title, deadline, completed)
+            VALUES (?, ?, ?)
+            """,
+            (task.title, task.deadline, task.completed)
         )
-        VALUES (?, ?, ?)
-        """,
-        (
-            task.title,
-            task.deadline,
-            task.completed
-        )
-    )
-
-    connection.commit()
-    connection.close()
+        connection.commit()
 
 
 def get_all_tasks():
+    with closing(get_connection()) as connection:
+        rows = connection.execute("""
+            SELECT id, title, deadline, completed
+            FROM tasks
+            ORDER BY
+                completed ASC,
+                CASE WHEN deadline IS NULL OR deadline = '' THEN 1 ELSE 0 END,
+                deadline ASC,
+                id DESC
+        """).fetchall()
 
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("SELECT * FROM tasks")
-    tasks = cursor.fetchall()
-
-    task_objects = []
-    
-    for row in tasks:
-        task = Task(
-            row[1],
-            row[2],
-            bool(row[3]),
-            row[0]
-        )
-
-        task_objects.append(task)
-
-    connection.close()
-    return task_objects
+    return [_row_to_task(row) for row in rows]
 
 
 def mark_task_completed(task_id):
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        UPDATE tasks
-        SET completed = 1
-        WHERE id = ?
-    """, (task_id,))
-
-    task_found = cursor.rowcount > 0
-
-    connection.commit()
-    connection.close()
+    with closing(get_connection()) as connection:
+        cursor = connection.execute("""
+            UPDATE tasks
+            SET completed = 1
+            WHERE id = ?
+        """, (task_id,))
+        task_found = cursor.rowcount > 0
+        connection.commit()
 
     return task_found
 
 
 def delete_task(task_id):
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        DELETE FROM tasks
-        WHERE id = ?
-    """, (task_id,))
-
-    task_found = cursor.rowcount > 0
-
-    connection.commit()
-    connection.close()
+    with closing(get_connection()) as connection:
+        cursor = connection.execute("""
+            DELETE FROM tasks
+            WHERE id = ?
+        """, (task_id,))
+        task_found = cursor.rowcount > 0
+        connection.commit()
 
     return task_found
 
 
 def get_task_by_id(task_id):
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        SELECT * FROM tasks
-        WHERE id = ?
-    """, (task_id,))
-
-    row = cursor.fetchone()
-    connection.close()
+    with closing(get_connection()) as connection:
+        row = connection.execute("""
+            SELECT id, title, deadline, completed
+            FROM tasks
+            WHERE id = ?
+        """, (task_id,)).fetchone()
 
     if row is None:
         return None
-    
-    return Task(
-        row[1],
-        row[2],
-        bool(row[3]),
-        row[0]
-    )
+
+    return _row_to_task(row)
 
 
 def update_task(task_id, title, deadline):
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        UPDATE tasks
-        SET title = ?, deadline = ?
-        WHERE id = ?
-    """, (title, deadline, task_id))
-
-    task_found = cursor.rowcount > 0
-
-    connection.commit()
-    connection.close()
+    with closing(get_connection()) as connection:
+        cursor = connection.execute("""
+            UPDATE tasks
+            SET title = ?, deadline = ?
+            WHERE id = ?
+        """, (title, deadline, task_id))
+        task_found = cursor.rowcount > 0
+        connection.commit()
 
     return task_found
+
+
+def _row_to_task(row):
+    return Task(
+        title=row[1],
+        deadline=row[2],
+        completed=bool(row[3]),
+        task_id=row[0]
+    )
